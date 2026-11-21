@@ -1,0 +1,74 @@
+/* Motor de recomendación técnica (cliente). Orienta por sector y equipo; la referencia final la confirma el equipo técnico de VGL según el manual del fabricante del equipo. */
+(function(){
+var L={
+ diesel:{n:"Motor diésel multigrado",s:"API CK-4 / CI-4 · SAE 15W-40",cat:"Motor diésel — trabajo pesado (multigrado)",line:"motor"},
+ dieselMono:{n:"Motor diésel monogrado",s:"API CF / CF-2 · SAE 40 o SAE 50",cat:"Motor diésel — monogrado",line:"motor"},
+ gasolina:{n:"Motor a gasolina",s:"API SN / SL · SAE 15W-40 o 20W-50 (o según manual)",cat:"Motor a gasolina — flotas livianas",line:"motor"},
+ motos:{n:"Motos 4T / 2T",s:"JASO MA · SAE 20W-50 / 10W-40",cat:"Motos",line:"motor"},
+ gasMotor:{n:"Motores a gas estacionarios",s:"SAE 30 / SAE 40, bajo contenido de cenizas",cat:"Motores a gas estacionarios",line:"motor"},
+ marino:{n:"Diésel marino",s:"SAE 30 / 40 / 50 · TBN según combustible",cat:"Diésel marino",line:"motor"},
+ hidraulico:{n:"Hidráulico antidesgaste",s:"AW / ISO VG 32, 46, 68 o 100",cat:"Hidráulicos",line:"industrial"},
+ engInd:{n:"Engranajes industriales",s:"EP / AGMA · ISO VG 100 a 680",cat:"Engranajes industriales",line:"industrial"},
+ transManual:{n:"Transmisión y diferenciales",s:"API GL-5 · SAE 80W-90 / 85W-140",cat:"Transmisiones manuales y diferenciales",line:"motor"},
+ to4:{n:"Transmisión de maquinaria pesada y tractores",s:"TO-4 · SAE 10W / 30 / 50 · fluido para tractores",cat:"Transmisión de maquinaria pesada y tractores",line:"motor"},
+ atf:{n:"Transmisión automática",s:"ATF Dexron III / Multi-vehículo",cat:"Transmisiones automáticas (ATF)",line:"motor"},
+ compresor:{n:"Compresores",s:"ISO VG 46 / 68 / 100",cat:"Compresores",line:"industrial"},
+ turbina:{n:"Turbinas y circulación",s:"ISO VG 32 / 46 / 68",cat:"Turbinas y circulación",line:"industrial"},
+ dielec:{n:"Dieléctrico para transformadores",s:"Aceite aislante tipo ASTM D3487",cat:"Transformadores (dieléctrico)",line:"industrial"},
+ grasa:{n:"Grasa multipropósito EP",s:"Litio / litio complejo · NLGI 2",cat:"Grasas",line:"grasa"},
+ grasaMo:{n:"Grasa con molibdeno",s:"MoS₂ · NLGI 2 · cargas de choque",cat:"Grasas",line:"grasa"},
+ refrig:{n:"Refrigerante de motor",s:"Según especificación del fabricante",cat:"Refrigerante de motor",line:"motor"}
+};
+var S=[
+ {id:"petroleo",n:"Petróleo y gas",d:"Operadoras, contratistas y servicios de campo.",eq:[
+  {id:"gen",n:"Generadores y motores diésel",r:["diesel","dieselMono"]},
+  {id:"gas",n:"Motocompresores y motores a gas",r:["gasMotor","compresor"]},
+  {id:"bomb",n:"Bombas, taladros e hidráulica",r:["hidraulico","grasa"]},
+  {id:"red",n:"Reductores y cajas industriales",r:["engInd"]},
+  {id:"trf",n:"Transformadores y subestaciones",r:["dielec"]},
+  {id:"lan",n:"Lanchas y embarcaciones",r:["marino"]}]},
+ {id:"transporte",n:"Transporte y logística",d:"Carga pesada, gandolas, autobuses y distribución.",eq:[
+  {id:"cam",n:"Camiones, gandolas y autobuses",r:["diesel","transManual","grasa"]},
+  {id:"liv",n:"Vehículos livianos a gasolina",r:["gasolina","atf"]},
+  {id:"caj",n:"Cajas y diferenciales",r:["transManual"]},
+  {id:"aut",n:"Transmisiones automáticas",r:["atf"]},
+  {id:"chs",n:"Chasis, quinta rueda y rodamientos",r:["grasa"]},
+  {id:"ref",n:"Sistema de enfriamiento",r:["refrig"]}]},
+ {id:"industria",n:"Industria y manufactura",d:"Plantas, líneas de producción y servicios eléctricos.",eq:[
+  {id:"hid",n:"Prensas y sistemas hidráulicos",r:["hidraulico"]},
+  {id:"red",n:"Reductores y engranajes",r:["engInd"]},
+  {id:"cmp",n:"Compresores de aire",r:["compresor"]},
+  {id:"tur",n:"Turbinas y sistemas de circulación",r:["turbina"]},
+  {id:"trf",n:"Transformadores",r:["dielec"]},
+  {id:"rod",n:"Rodamientos y acoples",r:["grasa"]},
+  {id:"gen",n:"Plantas eléctricas diésel",r:["diesel"]}]},
+ {id:"mineria",n:"Minería y construcción",d:"Maquinaria amarilla y equipos de trabajo pesado.",eq:[
+  {id:"maq",n:"Maquinaria pesada (motor)",r:["diesel","dieselMono"]},
+  {id:"tr",n:"Transmisiones y mandos finales",r:["to4"]},
+  {id:"hid",n:"Hidráulica de equipos",r:["hidraulico"]},
+  {id:"pin",n:"Pines, bujes y articulaciones",r:["grasaMo"]},
+  {id:"tri",n:"Trituradoras y reductores",r:["engInd","grasa"]}]},
+ {id:"agro",n:"Agroindustria",d:"Tractores, cosechadoras, riego y plantas de proceso.",eq:[
+  {id:"tra",n:"Tractores y cosechadoras (motor)",r:["diesel"]},
+  {id:"tt",n:"Transmisión e hidráulica de tractores",r:["to4","hidraulico"]},
+  {id:"rie",n:"Motobombas y riego",r:["dieselMono","diesel"]},
+  {id:"eng",n:"Implementos y engrase",r:["grasa"]},
+  {id:"pla",n:"Plantas de proceso",r:["engInd","hidraulico","compresor"]}]},
+ {id:"flota",n:"Flotas corporativas e institucionales",d:"Empresas y entes con parque automotor propio.",eq:[
+  {id:"liv",n:"Vehículos livianos y camionetas",r:["gasolina","atf"]},
+  {id:"dsl",n:"Camionetas y camiones diésel",r:["diesel","transManual"]},
+  {id:"mot",n:"Motos de servicio",r:["motos"]},
+  {id:"mix",n:"Flota mixta (mantenimiento preventivo)",r:["gasolina","diesel","transManual","grasa"]}]}
+];
+var LINES=[
+ {id:"motor",n:"Lubricantes de motor y transmisión"},
+ {id:"industrial",n:"Aceites industriales"},
+ {id:"grasa",n:"Grasas"},
+ {id:"filtros",n:"Filtros",soon:1},{id:"baterias",n:"Baterías",soon:1},{id:"cauchos",n:"Cauchos",soon:1},{id:"repuestos",n:"Repuestos industriales para góndolas",soon:1}
+];
+function pres(vol){vol=+vol||0;if(!vol)return "Por definir con el asesor";if(vol<200)return "Paila 19 L";if(vol<1200)return "Tambor 208 L";return "Tótem 1.000 L (o combinación con tambores)";}
+function recommend(sid,eids){var s=S.find(function(x){return x.id===sid});if(!s)return [];var keys=[];
+ s.eq.forEach(function(e){if(!eids||!eids.length||eids.indexOf(e.id)>-1)e.r.forEach(function(k){if(keys.indexOf(k)<0)keys.push(k)})});
+ return keys.map(function(k){var o=L[k];return {key:k,n:o.n,s:o.s,cat:o.cat,line:o.line,url:"/catalogo.html?cat="+encodeURIComponent(o.cat)+"#productos"}});}
+window.VGL_ADVISOR={lub:L,sectors:S,lines:LINES,recommend:recommend,presentation:pres};
+})();
