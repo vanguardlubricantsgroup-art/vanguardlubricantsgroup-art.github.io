@@ -1,11 +1,4 @@
-/* Configuración pública del sitio. Un solo correo y un solo identificador fiscal. */
-window.VGL={
-  name:"Vanguard Lubricants Group, C.A.",
-  rif:"J-50889518-5",
-  email:"vanguardlubricantsgroup@gmail.com",
-  phones:[
-    {display:"0412-775-3289",tel:"+584127753289",wa:"584127753289"},
-    {display:"0414-600-0222",tel:"+584146000222",wa:"584146000222"}
-  ],
-  city:"Valencia, Carabobo, Venezuela"
-};
+window.VGL={name:"Vanguard Lubricants Group, C.A.",rif:"J-50889518-5",email:"vanguardlubricantsgroup@gmail.com",phones:[{display:"0412-775-3289",tel:"+584127753289",wa:"584127753289"},{display:"0414-600-0222",tel:"+584146000222",wa:"584146000222"}],city:"Valencia, Carabobo, Venezuela"},function(e){e.nav=function(n){if(/^https?:/.test(n)){var a=window.open(n,"_blank");if(a)try{a.opener=null}catch(t){}else location.href=n}else location.href=n},e.wa=function(n,a){e.nav("https://wa.me/"+e.phones[n||0].wa+"?text="+encodeURIComponent(a))},e.mail=function(n,a){var t="mailto:"+e.email+"?subject="+encodeURIComponent(n)+"&body="+encodeURIComponent(a);if(t.length>1900){var i=`El detalle completo de la solicitud quedó copiado: péguelo aquí (Ctrl+V / Pegar).
+
+`,l=navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(a):Promise.reject();l.then(function(){for(var o=i+a;o.length>200&&encodeURIComponent(o).length>1500;)o=o.slice(0,Math.floor(o.length*.85));e.nav("mailto:"+e.email+"?subject="+encodeURIComponent(n)+"&body="+encodeURIComponent(o+(o.length<i.length+a.length?`
+…`:"")))},function(){e.nav(t)});return}e.nav(t)}}(window.VGL);
