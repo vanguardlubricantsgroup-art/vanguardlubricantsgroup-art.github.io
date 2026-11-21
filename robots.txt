@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://vanguardlubricantsgroup.com/sitemap.xml
